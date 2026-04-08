@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Diagnostics;
 
-namespace ЛР__3
+namespace ЛР№4
 {
     class Program
     {
