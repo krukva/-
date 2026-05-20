@@ -1,25 +1,96 @@
-﻿
-Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 17
-VisualStudioVersion = 17.14.36623.8 d17.14
-MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ЛБ 6", "ЛБ 6\ЛБ 6.csproj", "{52372CA5-1907-4109-B378-72EEA4E75762}"
-EndProject
-Global
-	GlobalSection(SolutionConfigurationPlatforms) = preSolution
-		Debug|Any CPU = Debug|Any CPU
-		Release|Any CPU = Release|Any CPU
-	EndGlobalSection
-	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{52372CA5-1907-4109-B378-72EEA4E75762}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{52372CA5-1907-4109-B378-72EEA4E75762}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{52372CA5-1907-4109-B378-72EEA4E75762}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{52372CA5-1907-4109-B378-72EEA4E75762}.Release|Any CPU.Build.0 = Release|Any CPU
-	EndGlobalSection
-	GlobalSection(SolutionProperties) = preSolution
-		HideSolutionNode = FALSE
-	EndGlobalSection
-	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {B86B2FE1-7048-400D-A9F4-1AA491D75148}
-	EndGlobalSection
-EndGlobal
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net.NetworkInformation;
+using System.Runtime.InteropServices;
+using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
+using Microsoft.Office.Interop.Excel;
+
+namespace ЛБ6
+{
+    internal class Program
+    {
+        static void Main(string[] args)
+        {
+            Application excelApp = new Application();
+
+            if (excelApp == null)
+            {
+                Console.WriteLine("Excel is not installed!");
+                return;
+            }
+            Workbook excelBook = excelApp.Workbooks.Open(@"E:\Users\Пахтин Никита\Desktop\Example.xlsx");
+
+            Thread potok1 = new Thread(vivod1);
+            potok1.Name = "Поток 1";
+
+            Thread potok2 = new Thread(vivod2);
+            potok2.Name = "Поток 2";
+
+            Console.WriteLine($"Имя потока: {potok1.Name}");
+            Console.WriteLine($"Статус потока: {potok1.ThreadState}");
+
+            Console.WriteLine($"Имя потока: {potok2.Name}");
+            Console.WriteLine($"Статус потока: {potok2.ThreadState}");
+
+            potok1.Start();
+            potok2.Start();
+
+            Thread.Sleep(100);
+            Console.WriteLine($"Имя потока: {potok1.Name}");
+            Console.WriteLine($"Статус потока: {potok1.ThreadState}");
+
+            Console.WriteLine($"Имя потока: {potok2.Name}");
+            Console.WriteLine($"Статус потока: {potok2.ThreadState}\n");
+
+            void vivod1()
+            {
+                _Worksheet excelSheet1 = excelBook.Sheets[1];
+                Range excelRange1 = excelSheet1.UsedRange;
+
+                int rows1 = excelRange1.Rows.Count;
+                int cols1 = excelRange1.Columns.Count;
+
+                for (int i = 1; i <= rows1; i++)
+                {
+                    Console.Write("\r\n");
+                    for (int j = 1; j <= cols1; j++)
+                    {
+                        if (excelRange1.Cells[i, j] != null && excelRange1.Cells[i, j].Value2 != null)
+                            Console.Write(excelRange1.Cells[i, j].Value2.ToString() + "\t");
+                    }
+                }
+            }
+            void vivod2()
+            {
+                Thread.Sleep(5000);
+                _Worksheet excelSheet2 = excelBook.Sheets[2];
+                Range excelRange2 = excelSheet2.UsedRange;
+
+                int rows2 = excelRange2.Rows.Count;
+                int cols2 = excelRange2.Columns.Count;
+
+                for (int i = 1; i <= rows2; i++)
+                {
+                    Console.Write("\r\n");
+                    for (int j = 1; j <= cols2; j++)
+                    {
+                        if (excelRange2.Cells[i, j] != null && excelRange2.Cells[i, j].Value2 != null)
+                            Console.Write(excelRange2.Cells[i, j].Value2.ToString() + "\t");
+                    }
+                }
+            }
+            Console.ReadLine();
+            Console.WriteLine($"Имя потока: {potok1.Name}");
+            Console.WriteLine($"Статус потока: {potok1.ThreadState}");
+
+            Console.WriteLine($"Имя потока: {potok2.Name}");
+            Console.WriteLine($"Статус потока: {potok2.ThreadState}\n");
+
+            excelApp.Quit();
+            System.Runtime.InteropServices.Marshal.ReleaseComObject(excelApp);
+        }
+    }
+}
